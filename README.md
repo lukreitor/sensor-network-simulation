@@ -12,6 +12,7 @@
 	<a href="https://github.com/lukreitor/sensor-network-simulation/graphs/traffic"><img alt="Total-Downloads" src="https://img.shields.io/github/downloads/lukreitor/sensor-network-simulation/total.svg?style=flat-square"/></a>
 </p>
 
+
 # Simulação de Rede de Sensores
 
 Este projeto simula uma rede de sensores dinâmica onde os nós podem atuar tanto como sensores quanto como destinos (sinks). O objetivo principal da simulação é garantir que os nós sensores possam enviar pacotes de dados para o destino mais próximo disponível, mesmo quando destinos são adicionados, removidos ou alterados dentro da rede. A simulação é projetada para rodar por 50 rodadas e se adaptar às mudanças na configuração da rede durante o processo.
@@ -46,56 +47,62 @@ Você pode instalar as bibliotecas necessárias usando pip:
 pip install matplotlib numpy
 ```
 
-### Explicação Detalhada do Problema
+## Explicação Detalhada do Problema
 
-O problema proposto consiste em simular uma rede de sensores que envolve múltiplos nós sensores distribuídos em uma área bidimensional de 1000x1000 unidades. Esses nós desempenham duas funções: atuam como sensores, capturando dados e enviando pacotes para outros nós, e podem ser configurados como "sinks", responsáveis por receber esses pacotes de dados. 
+O problema proposto consiste em simular uma rede de sensores que envolve múltiplos nós sensores distribuídos em uma área bidimensional de 1000x1000 unidades. Esses nós desempenham duas funções: atuam como sensores, capturando dados e enviando pacotes para outros nós, e podem ser configurados como "sinks", responsáveis por receber esses pacotes de dados.
 
 A complexidade do problema reside no fato de que, durante a simulação, os nós sinks podem ser adicionados, removidos ou alterados, e a rede deve se ajustar dinamicamente para garantir que os nós sensores continuem enviando pacotes para os sinks disponíveis mais próximos. A comunicação entre os nós deve ser eficiente e dinâmica, considerando as alterações dos sinks no decorrer do tempo. O objetivo principal é testar a resiliência e adaptabilidade dos nós sensores em condições variáveis, sem utilizar a função `sendDirect`, o que adiciona um nível de desafio à implementação.
 
-### O que Foi Implementado
+## O que Foi Implementado
 
-#### 1. **Modelo de Distribuição dos Nós Sensores**
+1. **Modelo de Distribuição dos Nós Sensores**  
    A rede foi configurada utilizando uma abordagem de distribuição em grade (Grid2D), onde os 100 nós sensores foram distribuídos uniformemente na área de 1000x1000 unidades. Isso permite garantir uma estrutura organizada e facilita o cálculo da distância entre os nós, essencial para determinar o nó sink mais próximo.
 
-#### 2. **Função de Sink**
+2. **Função de Sink**  
    Inicialmente, apenas um nó é designado como sink. Este nó recebe os pacotes enviados pelos outros nós sensores. Com o passar dos rounds, um segundo nó é designado como sink, e a rede deve adaptar-se a essa nova configuração, redirecionando os pacotes para o sink mais próximo.
 
-#### 3. **Simulação de Rounds**
+3. **Simulação de Rounds**  
    A simulação foi executada em três fases, com cada fase composta de 50 rounds:
    - **Fase 1**: O primeiro nó é designado como sink, e a rede opera com esse único sink por 50 rounds.
    - **Fase 2**: Um segundo sink é adicionado no nó de ID 50, e a rede se adapta para considerar os dois sinks.
    - **Fase 3**: O primeiro sink é removido, deixando apenas o segundo sink como receptor de pacotes. A rede se ajusta novamente para enviar os pacotes exclusivamente para esse sink.
 
-#### 4. **Coleta e Exibição dos Resultados**
+4. **Coleta e Exibição dos Resultados**  
    Durante cada round, foi coletado o número de mensagens enviadas e o número de sinks ativos. Esses dados foram então processados para gerar um relatório em formato Markdown e gráficos visuais, mostrando a evolução do comportamento da rede ao longo do tempo.
 
-#### 5. **Geração Automática de Relatório**
+5. **Geração Automática de Relatório**  
    Um arquivo Markdown (`sensor_simulation_report.md`) é gerado automaticamente ao fim da simulação. Este arquivo contém uma tabela com os resultados coletados em cada round, incluindo o número de sinks e o número de mensagens enviadas.
 
-#### 6. **Plotagem de Gráficos**
+6. **Plotagem de Gráficos**  
    Para complementar o relatório, gráficos são gerados e salvos automaticamente. Eles ilustram:
    - O número de sinks ativos ao longo dos rounds.
    - O número de mensagens enviadas pelos nós sensores em cada round.
 
-### Estrutura e Operação do Código
+## Análise dos Resultados
 
-1. **Classe `SensorNode`**: Representa um nó sensor. Cada nó possui um ID, coordenadas (x, y) no grid e um status que indica se é um sink ou não. A função principal do nó é enviar pacotes de dados para o sink mais próximo.
+Os gráficos e a tabela gerados pela simulação oferecem uma visão clara do comportamento da rede de sensores ao longo dos 50 rounds.
 
-2. **Funções de Distribuição e Simulação**: A função `create_grid_scenario()` distribui os nós sensores em um grid. A função `simulate_rounds()` simula o envio de pacotes pelos nós sensores para os sinks ativos durante vários rounds. A cada round, os nós sensores escolhem o sink mais próximo e enviam pacotes de dados para ele.
+### 1. **Número de Sinks Ativos**
+   Durante os primeiros 50 rounds, o gráfico mostra apenas um sink ativo, pois o sistema inicia com um único destino para os pacotes. A partir do round 51, um segundo sink é adicionado, e o gráfico reflete essa alteração com o aumento no número de sinks ativos. Isso é crucial para observar como a rede reage e redistribui os pacotes com a adição de novos destinos. Finalmente, quando o sink original é removido, o gráfico demonstra a adaptação da rede para operar com apenas um sink novamente.
 
-3. **Relatório e Gráficos**: O código gera automaticamente o relatório em Markdown e os gráficos dos resultados ao final da simulação. O relatório documenta todas as etapas e resultados, e os gráficos visualizam o comportamento da rede.
+### 2. **Número de Mensagens Enviadas**
+   O gráfico que mostra o número de mensagens enviadas reflete a dinâmica da rede e sua eficiência em transmitir dados. Nas primeiras 50 rodadas, a quantidade de mensagens enviadas mantém um padrão estável, pois há apenas um destino. Quando o segundo sink é adicionado, observa-se um aumento na eficiência, com os nós sensores redirecionando suas mensagens para o sink mais próximo, o que reduz a carga no sink inicial. Com a remoção do primeiro sink, os nós restantes ajustam-se ao novo cenário, mantendo uma taxa constante de envio de mensagens.
 
+Esses resultados mostram que a rede de sensores é capaz de se adaptar eficientemente a mudanças na configuração dos sinks, mantendo uma alta taxa de entrega de pacotes e um bom equilíbrio na utilização dos recursos disponíveis.
 
-### Resultados
-![Banner](./sensor_simulation_graph.png)
+### Gráfico de Desempenho
 
-### Conclusão
+![Desempenho da Simulação](./sensor_simulation_graph.png)
+
+## Conclusão
 
 O trabalho implementado simula com sucesso uma rede de sensores dinâmica que se adapta às mudanças na configuração dos sinks, garantindo que os nós sensores enviem pacotes para o sink mais próximo, mesmo após alterações no cenário. A documentação e os gráficos gerados oferecem uma visão clara do comportamento da rede ao longo dos rounds, permitindo a análise de eficiência e resiliência do sistema implementado.
 
 ### Sugestões Finais
 
 Este projeto pode ser estendido para incluir mais complexidade, como múltiplos tipos de pacotes de dados, diferentes estratégias de roteamento, ou até simulações mais longas com maiores números de nós sensores e sinks. Isso permitiria testar a escalabilidade e robustez do sistema em cenários mais realistas e desafiadores.
+
+---
 
 
 ## Contributors ✨
